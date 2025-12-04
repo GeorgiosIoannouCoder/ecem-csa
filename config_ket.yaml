@@ -1,0 +1,21 @@
+# KET Extension Configuration
+
+hidden_dim: 256            # must match the base encoder
+knowledge_dim: 64          # dimension of ConceptNet + NRC-VAD features
+num_labels: 7              # number of emotion classes
+
+use_conceptnet: true
+use_vad: true
+
+dropout: 0.1
+fusion_method: gated_add   # how knowledge is injected
+
+batch_size: 32
+learning_rate: 3e-5
+num_epochs: 5
+
+paths:
+  conceptnet: "knowledge_resources/conceptnet_features.pt"
+  vad: "knowledge_resources/vad_features.pt"
+  knowledge_demo: "knowledge_resources/demo_knowledge_features.pt"
+  save_model: "ket_optimized_model.pt"
