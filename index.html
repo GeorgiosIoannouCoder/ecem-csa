@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Conversations Are Long, Emotions Are Subtle</title>
+  <!-- external -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          Conversations Are Long, Emotions Are Subtle
+        </h1>
+        <h2 class="hero-subtitle">
+          How Memory Networks, Transformer-XL, and Emotion Anchors Reshape Conversational Emotion Recognition
+        </h2>
+        <div class="hero-meta">
+          DS-GA 1011 · Fall 2025 · Ellie Wang, Georgios Ioannou, Qiya Huang, Ruokai Gu, Ziyu Qi
+        </div>
+      </div>
+      <div class="hero-image">
+        <img src="images/hybrid-flowchart.svg" alt="Hybrid model flowchart" class="hero-flow">
+      </div>
+    </div>
+  </header>
+
+  <!--body -->
+  <div class="page">
+    <main class="content">
+      <h2>Why conversational emotion is hard</h2>
+      <p>
+        Single-utterance emotion classification is already challenging, but conversational emotion recognition raises the difficulty in several important ways. Emotions in dialogue rarely appear in clean, self-contained sentences. A single line like <i>“It’s fine, whatever”</i> might signal annoyance, resignation, or genuine agreement—its meaning depends almost entirely on the surrounding context and the speaker’s intent.
+      </p>      
+      <p>
+        More importantly, emotions in conversation unfold over time. They accumulate across turns, shift gradually, and often blur the boundaries between categories such as frustration, annoyance, and sadness. Yet many existing systems still analyze each utterance in isolation, overlooking the long-range dependencies and speaker-specific patterns that shape how emotions evolve within a dialogue.
+      </p>      
+      <p>
+        This blog explores whether modern neural architectures can better follow these emotional trajectories. Rather than proposing a new architecture from scratch, we revisit three influential ideas in conversational emotion recognition—speaker-specific memory networks (CMN), long-context transformers (Transformer-XL), and emotion-anchored contrastive learning (EACL). Each addresses a different limitation in how models interpret emotional dynamics.
+      </p>
+      <p>
+        We reproduce all three models on the IEMOCAP benchmark and study where they excel and where they fall short, centered around a guiding question:
+        <strong>Can long-range context modeling and structured emotional representations be combined into a single, more interpretable system?</strong>
+      </p>
+      <p>
+        The sections that follow trace this investigation—from CMN’s limited short-term memory, to Transformer-XL’s ability to capture emotional buildup across long conversations, to EACL’s reshaping of the embedding space using learned emotion anchors. Along the way, we compare their behaviors side-by-side, highlight a few surprising patterns, and outline a hybrid approach that integrates their most promising ideas.
+      </p>
+
+
+      <h2 id="problem">2. Problem Setup: Conversational Emotion Recognition</h2>
+      <p>
+        We focus on utterance-level emotion recognition in multi-turn dialogues.
+        Each conversation is a sequence of utterances produced by different speakers, and the goal is
+        to predict an emotion label (e.g., <i>happy</i>, <i>sad</i>, <i>angry</i>) for every utterance.
+        Our main benchmark is the IEMOCAP dataset, a widely used corpus of dyadic conversations with
+        speaker-annotated emotion labels.
+      </p>
+
+      <h2 id="cmn">3. Conversational Memory Networks (CMN, 2018)</h2>
+      <p>
+        CMN introduces speaker-specific memory modules that store recent utterances for each participant.
+        Multimodal features from text, audio, and visual channels are fused into a single vector and written
+        into the corresponding speaker memory. An attention mechanism then reads from these memories to
+        produce a context-aware representation for the current utterance, which is fed into a classifier.
+        CMN captures short-term emotional dependencies and speaker identity, but its fixed-size memory window
+        limits its ability to model long conversations and gradual emotional shifts.
+      </p>
+
+      <h2 id="txl">4. Transformer-XL for Long-Context Modeling</h2>
+      <p>
+        Standard transformers operate on fixed-length segments, which fragments long dialogues and prevents
+        the model from reusing information across segments. Transformer-XL addresses this by introducing
+        segment-level recurrence: hidden states from previous segments are cached and reused when encoding
+        new ones. Relative positional encodings further resolve confusion about where an utterance appears
+        in the overall sequence. When applied to conversational emotion recognition, Transformer-XL improves
+        the model's ability to track how emotions build up over many turns.
+      </p>
+
+      <h2 id="eacl">5. Emotion-Anchored Contrastive Learning (EACL, 2024)</h2>
+      <p>
+        Even with a strong encoder, many emotion categories remain confusable in representation space.
+        EACL proposes to learn a set of trainable <i>emotion anchors</i>, one prototype vector per class.
+        During training, each utterance embedding is pulled toward its corresponding anchor and pushed away
+        from others via a contrastive loss, while an additional anchor-angle loss keeps anchors themselves
+        well separated. This reshapes the embedding space so that similar emotions remain close but class
+        boundaries become clearer.
+      </p>
+
+      <h2 id="hybrid">6. Hybrid Architecture: Long Context + Emotion Anchors</h2>
+      <p>
+        Our main insight is that long-context modeling and emotion-anchored representation learning are
+        complementary. We therefore extend the CMN baseline by replacing its utterance encoder with a
+        Transformer-XL encoder and attaching an EACL-style contrastive head on top of the encoder outputs.
+        The overall loss combines cross-entropy for label prediction, a contrastive term for utterance–anchor
+        alignment, and an anchor-angle term that encourages diverse emotion prototypes. This hybrid design
+        is intended to promote both context stability across long conversations and clearer emotional
+        boundaries in the embedding space.
+      </p>
+
+      <h2 id="experiments">7. Experiments and Comparative Analysis</h2>
+      <p>
+        In our study, we reproduce CMN, Transformer-XL, and EACL on the IEMOCAP dataset and compare their
+        performance under a unified evaluation setup. We also analyze confusion matrices and embedding
+        visualizations to understand how each architecture handles similar emotion categories such as
+        <i>angry</i> vs. <i>frustrated</i>. Finally, we outline an evaluation protocol for the proposed
+        hybrid model, including metrics, cross-dataset tests, and speaker-independent splits.
+      </p>
+
+      <h2 id="conclusion">8. Discussion and Conclusion</h2>
+      <p>
+        Conversational emotion recognition challenges models to reason over long context, speaker identity,
+        and subtle differences between related emotions. Memory networks, recurrent transformers, and
+        contrastive emotion anchors each address a different part of this problem. By viewing them together
+        and proposing a hybrid architecture, we highlight how future work can move beyond single-model
+        improvements toward more integrated and interpretable approaches to emotion in dialogue.
+      </p>
+    </main>
+
+    <aside class="sidebar">
+      <div class="sidebar-title">QUICK LINKS</div>
+      <ul class="sidebar-link-list">
+        <li><a href="https://github.com/Anny405/ziyuqi.github.io" target="_blank">GitHub Repo</a></li>
+        <li><a href="POSTER_PDF_LINK_HERE" target="_blank">Poster (PDF)</a></li>
+        <li><a href="#hybrid">Hybrid Model</a></li>
+        <li><a href="#experiments">Experiments</a></li>
+      </ul>
+
+      <div class="sidebar-title">SHARE</div>
+      <p>
+        Copy and share this link:<br>
+        <code>https://anny405.github.io/ziyuqi.github.io/</code>
+      </p>
+    </aside>
+  </div>
+
+</body>
+</html>
+
