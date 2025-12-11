@@ -71,14 +71,66 @@
       </p>
 
       <h2 id="txl">4. Transformer-XL for Long-Context Modeling</h2>
-      <p>
-        Standard transformers operate on fixed-length segments, which fragments long dialogues and prevents
-        the model from reusing information across segments. Transformer-XL addresses this by introducing
-        segment-level recurrence: hidden states from previous segments are cached and reused when encoding
-        new ones. Relative positional encodings further resolve confusion about where an utterance appears
-        in the overall sequence. When applied to conversational emotion recognition, Transformer-XL improves
-        the model's ability to track how emotions build up over many turns.
-      </p>
+<p>
+Consider a scenario where a speaker begins a conversation calmly discussing work stress, then becomes increasingly frustrated over several turns, and finally expresses anger when the topic shifts back to the initial stressor. CMN's short window might catch the immediate trigger, but it misses the <em>emotional buildup</em> that spans much earlier in the dialogue. This is where <strong>Transformer-XL</strong> becomes valuable.
+</p>
+
+<h3>The Core Problem: Context Fragmentation</h3>
+
+<p>
+Standard transformers operate on fixed-length segments. When a conversation exceeds this length, it must be split into multiple chunks. This creates what the original Transformer-XL paper calls <strong>context fragmentation</strong>—the loss of continuity at segment boundaries. For emotion recognition, this is particularly problematic because <span class="highlight">emotional context doesn't respect arbitrary segment divisions</span>.
+</p>
+
+<h3>Transformer-XL's Solution: Segment-Level Recurrence</h3>
+
+<p>
+Transformer-XL introduces <strong>segment-level recurrence</strong> to address fragmentation. Instead of discarding hidden states after processing a segment, the model <em>caches</em> them and reuses them when encoding the next segment. Concretely:
+</p>
+
+<ul>
+    <li>Segment 1 (utterances 1-4) is encoded, producing hidden states <code>H₁</code>.</li>
+    <li>These states are cached in memory.</li>
+    <li>When encoding Segment 2 (utterances 5-8), the model attends not only to the current segment but also to the cached <code>H₁</code>.</li>
+    <li>This process repeats, creating a <em>recurrent connection</em> across segments while keeping backpropagation local to each segment.</li>
+</ul>
+
+<p>
+The result is that <span class="highlight">the effective context length grows linearly with the number of layers and segments</span>. The original Transformer-XL paper reports dependencies 80% longer than RNNs and 450% longer than vanilla transformers. For conversational emotion recognition, this means the model can now look back 10, 15, or even 20 turns to understand how emotions have evolved.
+</p>
+
+<img src="images/txl.png" alt="Architecture comparison: CMN Baseline vs CMN + Transformer-XL" class="architecture-img">
+<p class="caption">
+    <strong>Figure 1:</strong> Architectural comparison between CMN baseline and CMN enhanced with Transformer-XL. 
+</p>
+
+<h3>Relative Positional Encodings</h3>
+<p>
+A subtle but critical challenge arises when reusing cached states: <em>positional information becomes ambiguous</em>. In standard transformers, each token has an absolute position (e.g., position 3 in a sequence). But when Segment 2 reuses cached states from Segment 1, those cached states still "think" they're at positions 1–4, even though they're now being attended to from positions 5–8. This creates temporal confusion.
+</p>
+
+<p>
+Transformer-XL resolves this by replacing <strong>absolute positional encodings</strong> with <strong>relative positional encodings</strong>. Relative distances remain consistent regardless of which segment is being processed, allowing cached states to integrate smoothly into new contexts without losing their temporal coherence.
+</p>
+
+<h3>Integration with CMN</h3>
+<p>
+Rather than replacing CMN entirely, we <em>integrate</em> Transformer-XL into its architecture. This allows us to:
+</p>
+
+<ul>
+    <li>Track individual speaker states separately (maintaining CMN's design philosophy)</li>
+    <li>Extend each speaker's memory across longer conversational history (adding Transformer-XL's recurrence)</li>
+    <li>Apply relative positional encodings to handle temporal coherence</li>
+</ul>
+
+<p>
+The result is a model that combines <strong>speaker identity tracking</strong> with <strong>long-range dependency modeling</strong>—two complementary capabilities that neither CMN nor Transformer-XL alone fully addresses.
+</p>
+
+<h3>Impact</h3>
+<p>
+Transformer-XL shows the largest improvements on <em>long conversations</em> where emotions shift gradually across many turns. On shorter dialogues (≤5 turns), the benefit of extended context is modest, since CMN's fixed window already covers most of the conversation. However, for dialogues with longer turns—where emotional buildup, callbacks to earlier topics, and speaker interaction patterns span the entire conversation—Transformer-XL significantly outperform the CMN baseline.
+</p>
 
       <h2 id="eacl">5. Emotion-Anchored Contrastive Learning (EACL, 2024)</h2>
       <p>
