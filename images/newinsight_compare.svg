@@ -1,0 +1,78 @@
+<svg width="900" height="260" viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg">
+
+  <style>
+    .caption { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 12px; fill: #4b5563; }
+    .title   { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 14px; font-weight: 600; fill: #111827; }
+    .label   { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 11px; fill: #6b7280; }
+  </style>
+
+  <rect x="0" y="0" width="900" height="260" fill="#f9fafb"/>
+
+  <!-- 左：No anchors -->
+  <rect x="60" y="40" width="350" height="200" rx="12" ry="12" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="220" y="60" text-anchor="middle" class="title">Before: no emotion anchors</text>
+  <text x="220" y="78" text-anchor="middle" class="caption">Similar emotions overlap in embedding space</text>
+
+  <!-- Happy / Excited (yellow) -->
+  <circle cx="115" cy="115" r="6" fill="#facc15"/>
+  <circle cx="145" cy="135" r="6" fill="#facc15"/>
+  <circle cx="180" cy="120" r="6" fill="#facc15"/>
+  <circle cx="165" cy="160" r="6" fill="#facc15"/>
+
+  <!-- Sad (blue) -->
+  <circle cx="250" cy="150" r="6" fill="#3b82f6"/>
+  <circle cx="215" cy="140" r="6" fill="#3b82f6"/>
+  <circle cx="280" cy="115" r="6" fill="#3b82f6"/>
+
+  <!-- Angry / Frustrated (red) -->
+  <circle cx="170" cy="185" r="6" fill="#ef4444"/>
+  <circle cx="210" cy="170" r="6" fill="#ef4444"/>
+  <circle cx="245" cy="185" r="6" fill="#ef4444"/>
+
+  <circle cx="210" cy="130" r="6" fill="#ef4444" opacity="0.7"/>
+  <circle cx="190" cy="145" r="6" fill="#facc15" opacity="0.7"/>
+  <circle cx="230" cy="135" r="6" fill="#3b82f6" opacity="0.7"/>
+
+  <text x="120" y="205" class="label">Happy / Excited</text>
+  <text x="240" y="205" class="label">Sad</text>
+  <text x="175" y="220" class="label">Angry / Frustrated</text>
+
+  <!-- right：With anchors -->
+  <rect x="480" y="40" width="350" height="200" rx="12" ry="12" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="640" y="60" text-anchor="middle" class="title">After: emotion anchors + contrastive loss</text>
+  <text x="640" y="78" text-anchor="middle" class="caption">Clusters pulled toward anchors, boundaries clearer</text>
+
+  <!-- Happy anchor -->
+  <polygon points="545,115 548,123 556,123 550,128 552,136 545,132 538,136 540,128 534,123 542,123"
+           fill="#facc15"/>
+  <!-- Sad anchor -->
+  <polygon points="640,95 643,103 651,103 645,108 647,116 640,112 633,116 635,108 629,103 637,103"
+           fill="#3b82f6"/>
+  <!-- Angry/Frustrated anchor -->
+  <polygon points="725,145 728,153 736,153 730,158 732,166 725,162 718,166 720,158 714,153 722,153"
+           fill="#ef4444"/>
+
+  <!-- Happy cluster -->
+  <circle cx="520" cy="135" r="5" fill="#facc15"/>
+  <circle cx="535" cy="130" r="5" fill="#facc15"/>
+  <circle cx="555" cy="140" r="5" fill="#facc15"/>
+  <circle cx="560" cy="120" r="5" fill="#facc15"/>
+
+  <!-- Sad cluster -->
+  <circle cx="620" cy="120" r="5" fill="#3b82f6"/>
+  <circle cx="635" cy="130" r="5" fill="#3b82f6"/>
+  <circle cx="655" cy="115" r="5" fill="#3b82f6"/>
+  <circle cx="650" cy="135" r="5" fill="#3b82f6"/>
+
+  <!-- Angry/Frustrated cluster -->
+  <circle cx="710" cy="160" r="5" fill="#ef4444"/>
+  <circle cx="725" cy="155" r="5" fill="#ef4444"/>
+  <circle cx="740" cy="165" r="5" fill="#ef4444"/>
+  <circle cx="720" cy="170" r="5" fill="#ef4444"/>
+
+  <text x="525" y="205" class="label">Happy / Excited</text>
+  <text x="625" y="205" class="label">Sad</text>
+  <text x="710" y="205" class="label">Angry / Frustrated</text>
+  <text x="540" y="98" class="label">Emotion anchors</text>
+
+</svg>

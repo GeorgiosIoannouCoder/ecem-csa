@@ -1,0 +1,66 @@
+<svg width="900" height="260" viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg">
+
+  <style>
+    .box-title { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 14px; font-weight: 600; fill: #f9fafb; }
+    .box-sub   { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 12px; fill: #e5e7eb; }
+    .cap-title { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; font-weight: 600; fill: #111827; }
+    .cap-sub   { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 9px; fill: #4b5563; }
+    .label     { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 11px; fill: #6b7280; }
+  </style>
+
+  <rect x="0" y="0" width="900" height="260" fill="#f9fafb"/>
+  <!-- CMN -->
+  <rect x="40" y="40" rx="10" ry="10" width="190" height="55" fill="#6b21a8"/>
+  <text x="135" y="65" text-anchor="middle" class="box-title">CMN (2018)</text>
+  <text x="135" y="83" text-anchor="middle" class="box-sub">Speaker-specific memory</text>
+
+  <!-- Transformer-XL -->
+  <rect x="40" y="110" rx="10" ry="10" width="190" height="55" fill="#1d4ed8"/>
+  <text x="135" y="135" text-anchor="middle" class="box-title">Transformer-XL (2019)</text>
+  <text x="135" y="153" text-anchor="middle" class="box-sub">Long-range context</text>
+
+  <!-- EACL -->
+  <rect x="40" y="180" rx="10" ry="10" width="190" height="55" fill="#0f766e"/>
+  <text x="135" y="205" text-anchor="middle" class="box-title">EACL (2024)</text>
+  <text x="135" y="223" text-anchor="middle" class="box-sub">Emotion anchors</text>
+
+
+  <!-- Speaker memory -->
+  <rect x="340" y="40" rx="10" ry="10" width="210" height="55" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="445" y="63" text-anchor="middle" class="cap-title">Speaker-aware context</text>
+  <text x="445" y="82" text-anchor="middle" class="cap-sub">who is speaking, not just what is said</text>
+
+  <!-- Long context -->
+  <rect x="340" y="110" rx="10" ry="10" width="210" height="55" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="445" y="133" text-anchor="middle" class="cap-title">Long-range temporal modeling</text>
+  <text x="445" y="152" text-anchor="middle" class="cap-sub">emotions that build up over many turns</text>
+
+  <!-- Emotion space -->
+  <rect x="340" y="180" rx="10" ry="10" width="210" height="55" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="445" y="203" text-anchor="middle" class="cap-title">Structured emotion space</text>
+  <text x="445" y="222" text-anchor="middle" class="cap-sub">clearer boundaries between similar emotions</text>
+
+
+  <rect x="640" y="90" rx="12" ry="12" width="220" height="80" fill="#111827"/>
+  <text x="750" y="118" text-anchor="middle" class="box-title">Hybrid conversational model</text>
+  <text x="750" y="136" text-anchor="middle" class="box-sub">Long-context recurrence +</text>
+  <text x="750" y="152" text-anchor="middle" class="box-sub">emotion anchors + speaker memory</text>
+
+  
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L7,3 z" fill="#d1d5db"/>
+    </marker>
+  </defs>
+
+  <line x1="230" y1="67" x2="340" y2="67" stroke="#d1d5db" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="230" y1="137" x2="340" y2="137" stroke="#d1d5db" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="230" y1="207" x2="340" y2="207" stroke="#d1d5db" stroke-width="2" marker-end="url(#arrow)" />
+
+  <line x1="550" y1="67" x2="640" y2="112" stroke="#d1d5db" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="550" y1="137" x2="640" y2="130" stroke="#d1d5db" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="550" y1="207" x2="640" y2="148" stroke="#d1d5db" stroke-width="2" marker-end="url(#arrow)" />
+
+  <text x="40" y="24" class="label">Different models contribute complementary capabilities → combined in a single hybrid architecture.</text>
+
+</svg>

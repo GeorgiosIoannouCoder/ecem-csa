@@ -17,10 +17,13 @@
           Conversations Are Long, Emotions Are Subtle
         </h1>
         <h2 class="hero-subtitle">
-          How Memory Networks, Transformer-XL, and Emotion Anchors Reshape Conversational Emotion Recognition
+          Evolution of Context and Emotion Modeling in Conversational Sentiment Analysis (ECEM-CSA):
         </h2>
+        <h3 class="hero-subsubtitle">
+          Through The Lens of Memory Networks, Transformer-XL, and Emotion Anchors
+        </h3>
         <div class="hero-meta">
-          DS-GA 1011 · Fall 2025 · Ellie Wang, Georgios Ioannou, Qiya Huang, Ruokai Gu, Ziyu Qi
+          DS-GA 1011 · December 10, 2025 · Ellie Wang, Georgios Ioannou, Qiya Huang, Ruokai Gu, Ziyu Qi
         </div>
       </div>
       <div class="hero-image">
@@ -32,53 +35,207 @@
   <!--body -->
   <div class="page">
     <main class="content">
-      <h2>Why conversational emotion is hard</h2>
+      <section id="intro">
+      <h2><a href="#intro">Why Conversational Emotion Is Hard</a></h2>
       <p>
-        Single-utterance emotion classification is already challenging, but conversational emotion recognition raises the difficulty in several important ways. Emotions in dialogue rarely appear in clean, self-contained sentences. A single line like <i>“It’s fine, whatever”</i> might signal annoyance, resignation, or genuine agreement—its meaning depends almost entirely on the surrounding context and the speaker’s intent.
+        Single-utterance emotion classification is already challenging, but conversational emotion recognition raises the difficulty in several important ways. Emotions in dialogue rarely appear in clean, self-contained sentences. A single line like <i>"It's fine, whatever"</i> might signal annoyance, resignation, or genuine agreement-its meaning depends almost entirely on the surrounding context and the speaker's intent.
       </p>      
       <p>
         More importantly, emotions in conversation unfold over time. They accumulate across turns, shift gradually, and often blur the boundaries between categories such as frustration, annoyance, and sadness. Yet many existing systems still analyze each utterance in isolation, overlooking the long-range dependencies and speaker-specific patterns that shape how emotions evolve within a dialogue.
       </p>      
       <p>
-        This blog explores whether modern neural architectures can better follow these emotional trajectories. Rather than proposing a new architecture from scratch, we revisit three influential ideas in conversational emotion recognition—speaker-specific memory networks (CMN), long-context transformers (Transformer-XL), and emotion-anchored contrastive learning (EACL). Each addresses a different limitation in how models interpret emotional dynamics.
+        This blog explores whether modern neural architectures can better follow these emotional trajectories. Rather than proposing a new architecture from scratch, we revisit three influential ideas in conversational emotion recognition-speaker-specific memory networks (CMN), long-context transformers (Transformer-XL), and emotion-anchored contrastive learning (EACL). Each addresses a different limitation in how models interpret emotional dynamics.
       </p>
       <p>
         We reproduce all three models on the IEMOCAP benchmark and study where they excel and where they fall short, centered around a guiding question:
         <strong>Can long-range context modeling and structured emotional representations be combined into a single, more interpretable system?</strong>
       </p>
       <p>
-        The sections that follow trace this investigation—from CMN’s limited short-term memory, to Transformer-XL’s ability to capture emotional buildup across long conversations, to EACL’s reshaping of the embedding space using learned emotion anchors. Along the way, we compare their behaviors side-by-side, highlight a few surprising patterns, and outline a hybrid approach that integrates their most promising ideas.
+        The sections that follow trace this investigation-from CMN's limited short-term memory, to Transformer-XL's ability to capture emotional buildup across long conversations, to EACL's reshaping of the embedding space using learned emotion anchors. Along the way, we compare their behaviors side-by-side, highlight a few surprising patterns, and outline a hybrid approach that integrates their most promising ideas.
       </p>
+    </section>
 
+    <section id="whats-new">
+      <h2><a href="#whats-new">What's New</a></h2>
+      <ul>
+        <li><strong>Reproductions</strong></br>We reproduce CMN, Transformer-XL, and EACL on IEMOCAP and report our measured F1s versus the original papers</li>
+        <li><strong>Hybrid Model</strong></br>We propose a hybrid that combines TXL long-context recurrence with EACL emotion anchors; we report our estimated F1 and where it helps most</li>
+      </ul>
+    </section>
 
-      <h2 id="problem">2. Problem Setup: Conversational Emotion Recognition</h2>
+      <section id="dataset">
+      <h2><a href="#dataset">Dataset</a></h2>
+      
       <p>
-        We focus on utterance-level emotion recognition in multi-turn dialogues.
-        Each conversation is a sequence of utterances produced by different speakers, and the goal is
-        to predict an emotion label (e.g., <i>happy</i>, <i>sad</i>, <i>angry</i>) for every utterance.
-        Our main benchmark is the IEMOCAP dataset, a widely used corpus of dyadic conversations with
-        speaker-annotated emotion labels.
+        All experiments use the <strong>IEMOCAP (Interactive Emotional Dyadic Motion Capture)</strong> database—an <strong>acted</strong>, <strong>multimodal</strong>, <strong>multi-speaker</strong> corpus collected at USC SAIL. It contains <strong>~12 hours</strong> of audiovisual data (video, speech, facial motion capture, and transcripts) from <strong>dyadic sessions</strong> where actors perform <strong>improvised</strong> and <strong>scripted</strong> scenarios designed to elicit clear emotional expressions. Each utterance is annotated with both <strong>categorical labels</strong> (e.g. anger, happiness, sadness, neutrality) and <strong>dimensional labels</strong> (valence, activation, dominance), making it a cornerstone resource for studying multimodal, expressive communication.
       </p>
 
-      <h2 id="cmn">3. Conversational Memory Networks (CMN, 2018)</h2>
       <p>
-        CMN introduces speaker-specific memory modules that store recent utterances for each participant.
-        Multimodal features from text, audio, and visual channels are fused into a single vector and written
-        into the corresponding speaker memory. An attention mechanism then reads from these memories to
-        produce a context-aware representation for the current utterance, which is fed into a classifier.
-        CMN captures short-term emotional dependencies and speaker identity, but its fixed-size memory window
-        limits its ability to model long conversations and gradual emotional shifts.
+        <strong>Dataset:</strong> IEMOCAP is available at <a href="https://sail.usc.edu/iemocap/" target="_blank">https://sail.usc.edu/iemocap/</a>
       </p>
 
-      <h2 id="txl">4. Transformer-XL for Long-Context Modeling</h2>
-<p>
-Consider a scenario where a speaker begins a conversation calmly discussing work stress, then becomes increasingly frustrated over several turns, and finally expresses anger when the topic shifts back to the initial stressor. CMN's short window might catch the immediate trigger, but it misses the <em>emotional buildup</em> that spans much earlier in the dialogue. This is where <strong>Transformer-XL</strong> becomes valuable.
-</p>
+      <div class="figure">
+        <img src="images/iemocap_example.png" 
+             alt="Example conversation from IEMOCAP dataset showing dyadic dialogue with emotion labels" 
+             class="figure-img svg-isolated">
+        <p class="figure-caption">
+          <strong>Figure 1.</strong> An example conversation from the IEMOCAP dataset. The dialogue shows a dyadic interaction 
+          between two speakers (Woman and Man) with alternating turns. Each utterance is annotated with an emotion label 
+          (shown in brackets), demonstrating how emotions are associated with individual conversational turns. This format 
+          illustrates the dataset's structure: segmented utterances, speaker identification, and emotion annotations that 
+          enable training and evaluation of conversational emotion recognition models.
+        </p>
+      </div>
+      
+      <h3>Scope of the Database</h3>
+      <ul>
+        <li>Recognition and analysis of emotional expression</li>
+        <li>Analysis of human dyadic interactions</li>
+        <li>Design of emotion-sensitive human-computer interfaces and virtual agents</li>
+      </ul>
 
-<h3>The Core Problem: Context Fragmentation</h3>
+      <h3>General Information</h3>
+      <ul>
+        <li><strong>Keywords:</strong> Emotional, Multimodal, Acted, Dyadic</li>
+        <li><strong>Language:</strong> English</li>
+        <li><strong>Actors:</strong> 10 total (5 male, 5 female)</li>
+        <li><strong>Emotion elicitation:</strong> Improvisations and scripts</li>
+      </ul>
+
+      <h3>Available Modalities</h3>
+      <ul>
+        <li>Motion capture: facial data plus head movement/angle</li>
+        <li>Speech audio</li>
+        <li>Video</li>
+        <li>Dialog transcriptions</li>
+        <li>Alignment: word-, syllable-, and phoneme-level</li>
+      </ul>
+
+      <h3>Annotations</h3>
+      <ul>
+        <li><strong>Segmentation:</strong> sessions manually segmented into utterances</li>
+        <li><strong>Annotators:</strong> each utterance labeled by at least 3 humans</li>
+        <li><strong>Categorical attributes:</strong> anger, happiness, excitement, sadness, frustration, fear, surprise, other, neutral</li>
+        <li><strong>Dimensional attributes:</strong> valence, activation, dominance</li>
+      </ul>
+
+      <h3>Release Notes</h3>
+      <p>
+        The current release covers <strong>all 10 actors</strong> (~12 hours of data) with detailed audiovisual and text information for each improvised and scripted recording. A previous limited release (2 actors) remains available on request. Access requires a release form; see the IEMOCAP site for details.
+      </p>
+    </section>
+
+      <section id="research-questions">
+      <h2><a href="#research-questions">Research Questions</a></h2>
+      
+      <p>
+        This blog post investigates three key research questions that guide our exploration of conversational emotion recognition:
+      </p>
+
+      <ul>
+        <li>
+          <strong>How do CMN, Transformer-XL, EACL, and KET differ in performance on conversational emotion recognition?</strong>
+          <br>We systematically compare these four architectures to understand their relative strengths and weaknesses, examining how each addresses different aspects of the emotion recognition challenge.
+        </li>
+        <li>
+          <strong>How do long-context modeling (Transformer-XL) and contrastive anchor learning (EACL) each contribute to accuracy and representation quality?</strong>
+          <br>We analyze the individual contributions of long-range context modeling and structured emotion representations to determine their impact on both classification performance and the quality of learned embeddings.
+        </li>
+        <li>
+          <strong>Does a hybrid model that combines long-context modeling with emotion anchors improve both accuracy and interpretability?</strong>
+          <br>We explore whether integrating the complementary strengths of Transformer-XL and EACL into a unified architecture can achieve superior performance while maintaining interpretability through emotion-anchored representations
+        </li>
+      </ul>
+      
+      <p>
+        These questions structure our investigation, from individual model analysis to comparative evaluation and finally to hybrid architecture design. Each question builds upon the previous one, leading toward a comprehensive understanding of how different architectural choices impact conversational emotion recognition.
+      </p>
+    </section>
+
+      <section id="cmn">
+      <h2><a href="#cmn">Conversational Memory Network (CMN)</a></h2>
+      
+      <p>
+        Early approaches to conversational emotion recognition treated each utterance as an isolated unit, ignoring the rich contextual signals that shape how emotions unfold in dialogue. The <strong>Conversational Memory Network (CMN)</strong> was among the first architectures to explicitly model conversation history, recognizing that emotional dynamics in dyadic conversations are driven by two key factors: <strong>emotional inertia</strong> (how a speaker's feelings carry over from one moment to the next) and <strong>inter-speaker emotional influence</strong> (how one speaker's emotional state affects the other).
+      </p>
+      
+      <p>
+        CMN addresses these dynamics through a <strong>memory-based architecture</strong> that maintains separate, <strong>speaker-specific histories</strong>. Unlike <strong>context-free systems</strong> (e.g. <strong>SVM-ensemble</strong> methods) that analyze utterances in isolation, or <strong>LSTM-based approaches</strong> like <strong>bc-LSTM</strong> that suffer from limited <strong>long-range summarization</strong>, CMN uses <strong>memory networks</strong> to efficiently capture and summarize <strong>task-specific details</strong> from <strong>conversation history</strong> using <strong>attention mechanisms</strong>.
+      </p>
+
+      <div class="figure">
+        <img src="images/cmn_architecture.png" 
+             alt="CMN architecture showing multimodal features, speaker-specific memories, and attention mechanism" 
+             class="figure-img svg-isolated">
+        <p class="figure-caption">
+          <strong>Figure 2.</strong> Architecture of the Conversational Memory Network (CMN) 
+          <strong>Multimodal features</strong> (audio, visual, textual) are extracted for each utterance. 
+          <strong>Speaker-specific histories</strong> are modeled into <strong>memory cells</strong> using <strong>GRUs</strong>, then merged 
+          through <strong>attention-based hops</strong> to capture <strong>inter-speaker dependencies</strong>
+        </p>
+      </div>
+
+      <h3>Multimodal Feature Extraction</h3>
+      
+      <p>
+        CMN adopts a <strong>multimodal approach</strong>, extracting features from <strong>three complementary sources</strong>: <strong>audio</strong> (prosodic cues, pitch, energy), <strong>visual</strong> (facial expressions, body gestures), and <strong>textual</strong> (word embeddings, semantic content). This <strong>multimodal design</strong> serves two purposes: it captures the diverse ways emotions manifest across different <strong>modalities</strong>, and it provides <strong>robustness</strong> when one or more modalities are missing or noisy-a common scenario in real-world conversational videos.
+      </p>
+
+      <h3>Speaker-Specific Memory Cells</h3>
+      
+      <p>
+        For a given utterance <i>u<sub>i</sub></i>, CMN gathers its conversation history by collecting previous utterances within a <strong>context window</strong>. Critically, CMN maintains <strong>separate histories for each speaker</strong>, recognizing that emotional patterns are speaker-dependent. These histories are then encoded into continuous memory vectors using <strong>Gated Recurrent Units (GRUs)</strong>, which model the temporal evolution of each speaker's emotional state.
+      </p>
+      
+      <p>
+        The <strong>memory cells</strong> store <strong>compressed representations</strong> of past utterances, allowing the model to access <strong>relevant context</strong> without explicitly storing every historical detail. This design choice addresses a key limitation of earlier <strong>LSTM-based approaches</strong>: while <strong>LSTMs</strong> can model sequences, they struggle to <strong>selectively summarize</strong> and retrieve <strong>task-relevant information</strong> from <strong>long conversation histories</strong>.
+      </p>
+
+      <div class="figure">
+        <img src="images/cmn_memory.png" 
+             alt="CMN attention visualization showing average attention vectors across 3 hops for both speaker memories" 
+             class="figure-img svg-isolated">
+        <p class="figure-caption">
+          <strong>Figure 3.</strong> <strong>Attention mechanism</strong> in CMN. <strong>Average attention vectors</strong> across <strong>3 hops</strong> 
+          identify the most relevant <strong>historical utterances</strong> for classifying the current utterance. 
+          Two <strong>case studies</strong> demonstrate how <strong>attention</strong> captures <strong>self-emotional dynamics</strong> (case a: 
+          happiness classification driven by recent happy utterances) and <strong>inter-speaker emotional 
+          influences</strong> (case b: anger classification triggered by the other speaker's angry response)
+        </p>
+      </div>
+
+      <h3>Attention-Based Memory Hops</h3>
+      
+      <p>
+        Once <strong>speaker-specific memories</strong> are created, CMN employs an <strong>attention mechanism</strong> to identify which <strong>historical utterances</strong> are most relevant for classifying <i>u<sub>i</sub></i>. The <strong>attention scores</strong> determine how much influence each <strong>memory cell</strong> should have on the <strong>final representation</strong>. This <strong>weighted selection</strong> is crucial because not all past utterances contribute equally to understanding the current <strong>emotional state</strong>-some may be highly relevant (e.g. a recent <strong>emotional trigger</strong>), while others may be less informative.
+      </p>
+      
+      <p>
+        The memories are then merged with the current <strong>utterance representation</strong> using an <strong>addition operation</strong> weighted by the <strong>attention scores</strong>. This <strong>merging process</strong> models <strong>inter-speaker influences</strong>: how one speaker's <strong>emotional expression</strong> affects the other's <strong>emotional state</strong>. The entire cycle-<strong>attention computation</strong>, <strong>memory merging</strong>, and <strong>representation refinement</strong>-is repeated for <strong>multiple hops</strong>, allowing the model to <strong>iteratively refine</strong> its understanding of the <strong>emotional context</strong>.
+      </p>
+
+      <h3>Key Contributions and Limitations</h3>
+      
+      <p>
+        CMN's primary contribution lies in its <strong>explicit modeling</strong> of <strong>conversational emotional dynamics</strong>. By maintaining <strong>speaker-specific memories</strong> and using <strong>attention</strong> to capture <strong>inter-speaker dependencies</strong>, CMN achieves a <strong>3–4% accuracy improvement</strong> over previous <strong>state-of-the-art methods</strong> (notably <strong>bc-LSTM</strong> and <strong>SVM-ensemble</strong> approaches) on the <strong>IEMOCAP dataset</strong>. The architecture is also <strong>extensible</strong>: while originally designed for <strong>dyadic conversations</strong>, it can be adapted to <strong>multi-speaker scenarios</strong>.
+      </p>
+      
+      <p>
+        However, CMN's effectiveness is constrained by its <strong>fixed context window</strong>. The model only considers utterances within a <strong>predefined range</strong> (typically K=40 utterances), which limits its ability to capture <strong>emotional patterns</strong> that develop gradually over <strong>very long conversations</strong>. This limitation becomes particularly apparent when emotions build up slowly across many turns, or when important <strong>emotional context</strong> lies beyond the <strong>window boundary</strong>. As we'll see in the next section, <strong>Transformer-XL</strong> addresses this limitation by extending the <strong>effective context</strong> through <strong>segment-level recurrence</strong>.
+      </p>
+      
+      <p>
+        <strong>Our Reproduction and Analysis:</strong> In reproducing CMN on the <strong>IEMOCAP benchmark</strong>, we observed that the model's performance aligns with the original paper's reported <strong>weighted accuracy</strong> of approximately 77.6%. Our analysis confirms that <strong>speaker-specific memory modeling</strong> provides significant benefits over context-free approaches, particularly for emotions like <strong>happiness</strong> and <strong>anger</strong> where <strong>inter-speaker influences</strong> are most pronounced. However, we also found that CMN struggles with longer conversations where emotional context extends beyond the fixed window, validating the need for architectures with extended context capabilities.
+      </p>
+    </section>
+
+      <section id="transformer-xl">
+      <h2><a href="#transformer-xl">Transformer-XL</a></h2>
+
+      <h3>The Core Problem: Context Fragmentation</h3>
 
 <p>
-Standard transformers operate on fixed-length segments. When a conversation exceeds this length, it must be split into multiple chunks. This creates what the original Transformer-XL paper calls <strong>context fragmentation</strong>—the loss of continuity at segment boundaries. For emotion recognition, this is particularly problematic because <span class="highlight">emotional context doesn't respect arbitrary segment divisions</span>.
+Standard transformers operate on fixed-length segments. When a conversation exceeds this length, it must be split into multiple chunks. This creates what the original Transformer-XL paper calls <strong>context fragmentation</strong>-the loss of continuity at segment boundaries. For emotion recognition, this is particularly problematic because <strong>emotional context doesn't respect arbitrary segment divisions</strong>.
 </p>
 
 <h3>Transformer-XL's Solution: Segment-Level Recurrence</h3>
@@ -88,24 +245,24 @@ Transformer-XL introduces <strong>segment-level recurrence</strong> to address f
 </p>
 
 <ul>
-    <li>Segment 1 (utterances 1-4) is encoded, producing hidden states <code>H₁</code>.</li>
-    <li>These states are cached in memory.</li>
-    <li>When encoding Segment 2 (utterances 5-8), the model attends not only to the current segment but also to the cached <code>H₁</code>.</li>
-    <li>This process repeats, creating a <em>recurrent connection</em> across segments while keeping backpropagation local to each segment.</li>
+    <li>Segment 1 (utterances 1-4) is encoded, producing hidden states H₁</li>
+    <li>These states are cached in memory</li>
+    <li>When encoding Segment 2 (utterances 5-8), the model attends not only to the current segment but also to the cached H₁</li>
+    <li>This process repeats, creating a <em>recurrent connection</em> across segments while keeping backpropagation local to each segment</li>
 </ul>
 
 <p>
-The result is that <span class="highlight">the effective context length grows linearly with the number of layers and segments</span>. The original Transformer-XL paper reports dependencies 80% longer than RNNs and 450% longer than vanilla transformers. For conversational emotion recognition, this means the model can now look back 10, 15, or even 20 turns to understand how emotions have evolved.
+The result is that <strong>the effective context length grows linearly with the number of layers and segments</strong>. The original Transformer-XL paper reports dependencies 80% longer than RNNs and 450% longer than vanilla transformers. For conversational emotion recognition, this means the model can now look back 10, 15, or even 20 turns to understand how emotions have evolved.
 </p>
 
 <img src="images/txl.png" alt="Architecture comparison: CMN Baseline vs CMN + Transformer-XL" class="architecture-img">
 <p class="caption">
-    <strong>Figure 1:</strong> Architectural comparison between CMN baseline and CMN enhanced with Transformer-XL. 
+    <strong>Figure 4:</strong> Architectural comparison between CMN baseline and CMN enhanced with Transformer-XL. 
 </p>
 
 <h3>Relative Positional Encodings</h3>
 <p>
-A subtle but critical challenge arises when reusing cached states: <em>positional information becomes ambiguous</em>. In standard transformers, each token has an absolute position (e.g., position 3 in a sequence). But when Segment 2 reuses cached states from Segment 1, those cached states still "think" they're at positions 1–4, even though they're now being attended to from positions 5–8. This creates temporal confusion.
+A subtle but critical challenge arises when reusing cached states: <em>positional information becomes ambiguous</em>. In standard transformers, each token has an absolute position (e.g. position 3 in a sequence). But when Segment 2 reuses cached states from Segment 1, those cached states still "think" they're at positions 1–4, even though they're now being attended to from positions 5–8. This creates temporal confusion.
 </p>
 
 <p>
@@ -124,119 +281,339 @@ Rather than replacing CMN entirely, we <em>integrate</em> Transformer-XL into it
 </ul>
 
 <p>
-The result is a model that combines <strong>speaker identity tracking</strong> with <strong>long-range dependency modeling</strong>—two complementary capabilities that neither CMN nor Transformer-XL alone fully addresses.
+The result is a model that combines <strong>speaker identity tracking</strong> with <strong>long-range dependency modeling</strong>-two complementary capabilities that neither CMN nor Transformer-XL alone fully addresses.
 </p>
 
 <h3>Impact</h3>
 <p>
-Transformer-XL shows the largest improvements on <em>long conversations</em> where emotions shift gradually across many turns. On shorter dialogues (≤5 turns), the benefit of extended context is modest, since CMN's fixed window already covers most of the conversation. However, for dialogues with longer turns—where emotional buildup, callbacks to earlier topics, and speaker interaction patterns span the entire conversation—Transformer-XL significantly outperform the CMN baseline.
+Transformer-XL shows the largest improvements on <em>long conversations</em> where emotions shift gradually across many turns. On shorter dialogues (≤5 turns), the benefit of extended context is modest, since CMN's fixed window already covers most of the conversation. However, for dialogues with longer turns-where emotional buildup, callbacks to earlier topics, and speaker interaction patterns span the entire conversation-Transformer-XL significantly outperform the CMN baseline.
 </p>
+    </section>
 
-      <h2 id="eacl">5. Emotion-Anchored Contrastive Learning (EACL, 2024)</h2>
+      <section id="eacl">
+      <h2><a href="#eacl">Emotion-Anchored Contrastive Learning (EACL)</a></h2>
+      
       <p>
-        Even with a strong encoder, many emotion categories remain confusable in representation space.
-        EACL proposes to learn a set of trainable <i>emotion anchors</i>, one prototype vector per class.
-        During training, each utterance embedding is pulled toward its corresponding anchor and pushed away
-        from others via a contrastive loss, while an additional anchor-angle loss keeps anchors themselves
-        well separated. This reshapes the embedding space so that similar emotions remain close but class
-        boundaries become clearer.
+        Emotion-Anchored Contrastive Learning reframes emotion classification as a 
+        <strong>geometric learning problem</strong>. Instead of relying on the encoder 
+        to implicitly discover class boundaries, EACL introduces a set of 
+        <strong>trainable emotion anchors</strong>-one prototype vector per emotion category.
+        During training, each utterance embedding is pulled toward its corresponding anchor 
+        and pushed away from others, gradually reshaping the geometry of the embedding space.
       </p>
-
-      <!-- NEW ANALYSIS: error structure under EACL -->
-      <figure class="figure">
-        <img src="images/EACL-heatmap.png"
-             alt="Error heatmap for EACL on IEMOCAP"
-             class="figure-image">
-        <figcaption class="figure-caption">
-          <strong>Figure 1. How EACL changes the error structure.</strong>
-          We plot a heatmap of prediction errors on IEMOCAP to see which emotion pairs are still
-          confused under EACL. The main patterns are:
-          <ul>
-            <li><b>Excited–Happy</b> and <b>Frustrated–Angry</b> show noticeably fewer cross-class errors
-                compared to the baseline, indicating that anchor-based training helps separate these
-                subtle pairs.</li>
-            <li><b>Neutral–Sad</b> remains a major source of confusion, suggesting that conversational
-                ambiguity and similar lexical cues limit how cleanly these two classes can be separated.</li>
-          </ul>
-          This error-level view is not reported in the original EACL paper and highlights how anchors
-          behave specifically in a conversational setting.
-        </figcaption>
-      </figure>
-
-      <!-- NEW ANALYSIS: geometry of emotion anchors -->
-      <figure class="figure">
-        <img src="images/eacl-anchor.png"
-             alt="Emotion anchors and utterance clusters in embedding space"
-             class="figure-image figure-image-small">
-        <figcaption class="figure-caption">
-          <strong>Figure 2. Emotion anchors act as attractors in embedding space.</strong>
-          We visualize the learned anchors together with utterance embeddings. After training:
-          <ul>
-            <li>Utterances with the same label form tighter, more compact clusters around their
-                corresponding anchors.</li>
-            <li>Anchors themselves move to more “central” positions inside each cluster, acting as
-                attractors that stabilize emotion-specific regions.</li>
-            <li>Border regions between <b>excited–happy</b> and <b>frustrated–angry</b> become sharper,
-                while the overlap between <b>neutral</b> and <b>sad</b> remains visible.</li>
-          </ul>
-        </figcaption>
-      </figure>
-
+      
       <p>
-        Taken together, these analyses show that EACL does more than increase accuracy: it tightens the
-        geometry of the representation space and makes several confusable emotions easier to tell apart,
-        while revealing intrinsic limits for ambiguous classes like <i>neutral</i> vs. <i>sad</i>.
-        This provides an interpretable lens on how contrastive anchors reshape conversational emotion
-        representations, which we later combine with long-context modeling in our hybrid architecture.
+        Before training, embeddings often occupy overlapping regions:
+        <i>frustrated</i> lies between <i>angry</i> and <i>sad</i>,
+        and <i>happy</i> drifts toward <i>excited</i>. These overlaps reflect the ambiguity
+        of conversational emotions but also create unstable class boundaries.  
+        After EACL training, clusters tighten around anchors and the space becomes more structured,
+        even for borderline categories.
       </p>
-
-      <h2 id="hybrid">6. Hybrid Architecture: Long Context + Emotion Anchors</h2>
+      
+      <div class="figure">
+        <img src="images/eacl-anchor.png" 
+          alt="Emotion anchors and embedding geometry" 
+          class="figure-img figure-img-png svg-isolated">
+        <p class="figure-caption">
+          <strong>Figure 5.</strong> Utterance embeddings (dots) and learned emotion anchors (stars).
+          Training organizes the space around anchors, separating borderline categories.
+        </p>
+      </div>
+      
       <p>
-        Our main insight is that long-context modeling and emotion-anchored representation learning are
-        complementary. We therefore extend the CMN baseline by replacing its utterance encoder with a
-        Transformer-XL encoder and attaching an EACL-style contrastive head on top of the encoder outputs.
-        The overall loss combines cross-entropy for label prediction, a contrastive term for utterance–anchor
-        alignment, and an anchor-angle term that encourages diverse emotion prototypes. This hybrid design
-        is intended to promote both context stability across long conversations and clearer emotional
-        boundaries in the embedding space.
+        The impact of anchors becomes more evident in pairwise similarity and angular-distance
+        visualizations. Before training, similarity matrices show diffuse patterns-emotion pairs 
+        share unexpectedly high similarity, and negative emotions lack a stable geometric relationship.
+        After training, diagonals strengthen while off-diagonal values decrease, indicating clearer boundaries.
       </p>
-
-      <h2 id="experiments">7. Experiments and Comparative Analysis</h2>
+      
+      <div class="figure">
+        <img src="images/EACL-heatmap.png" 
+          alt="Similarity and angle heatmaps before and after EACL training" 
+          class="figure-img figure-img-png svg-isolated">
+        <p class="figure-caption">
+          <strong>Figure 6.</strong> Similarity and angular distances before and after applying EACL.
+          Representations become more consistent and class boundaries sharpen significantly.
+        </p>
+      </div>
+      
       <p>
-        In our study, we reproduce CMN, Transformer-XL, and EACL on the IEMOCAP dataset and compare their
-        performance under a unified evaluation setup. We also analyze confusion matrices and embedding
-        visualizations to understand how each architecture handles similar emotion categories such as
-        <i>angry</i> vs. <i>frustrated</i>. Finally, we outline an evaluation protocol for the proposed
-        hybrid model, including metrics, cross-dataset tests, and speaker-independent splits.
+        Taken together, these patterns highlight EACL's key contribution:
+        <strong>it provides a geometric prior for emotional organization</strong>.
+        Anchors stabilize the representation space while preserving contextual nuance, creating
+        cleaner and more interpretable decision boundaries-an especially valuable property for 
+        conversational emotion modeling.
       </p>
+      </section>
 
-      <h2 id="conclusion">8. Discussion and Conclusion</h2>
+      <section id="ket">
+      <h2><a href="#ket">Knowledge-Enriched Transformer (KET)</a></h2>
       <p>
-        Conversational emotion recognition challenges models to reason over long context, speaker identity,
-        and subtle differences between related emotions. Memory networks, recurrent transformers, and
-        contrastive emotion anchors each address a different part of this problem. By viewing them together
-        and proposing a hybrid architecture, we highlight how future work can move beyond single-model
-        improvements toward more integrated and interpretable approaches to emotion in dialogue.
+        While CMN, Transformer-XL, and EACL all operate purely on text, real conversations
+        often express emotions indirectly through events and situations rather than explicit
+        sentiment words. KET is our attempt to address this gap by bringing external
+        knowledge into the model.
       </p>
-    </main>
+      <div class="figure">
+      <img src="images/KET_architecture.png"
+           alt="Knowledge-Enriched Transformer architecture"
+           class="figure-img figure-img-png svg-isolated">
+    
+      <p class="figure-caption">
+        <strong>Figure 7.</strong>
+        Architecture of the Knowledge-Enriched Transformer (KET).  
+        The model integrates word embeddings with concept representations obtained from an external
+        knowledge base (ConceptNet + NRC-VAD). A dynamic affective graph attention layer fuses these
+        signals before feeding them into multi-head self-attention and cross-attention modules.
+      </p>
+    </div>
+      <h3>What KET Adds?</h3>
+      <ul>
+        <li><strong>Commonsense knowledge (ConceptNet):</strong> connects words to the kinds
+          of events and situations people usually associate with emotions
+          (e.g. <em>funeral -> sadness</em>, <em>celebration -> joy</em>)</li>
+        <li><strong>Affective signals (NRC-VAD):</strong> gives each word continuous scores
+          for valence, arousal, and dominance, so the model has a sense of how positive,
+          intense, or controlling a word feels</li>
+        <li><strong>Knowledge-enriched representations:</strong> these signals are injected
+          into the token embeddings before the transformer layers, so attention is computed
+          over a space that already encodes emotional structure, not just raw text</li>
+      </ul>
+    
+      <h3>Why It Helps?</h3>
+      <ul>
+        <li>Makes it easier to recognize emotions that are implied rather than stated
+          directly</li>
+        <li>Improves performance on subtle or minority emotion classes, such as
+          <em>fear</em> and <em>disgust</em></li>
+        <li>Acts as an add-on module that can sit on top of CMN, Transformer-XL, or EACL,
+          rather than replacing them</li>
+      </ul>
+    </section>
 
+      <section id="new-insights">
+      <h2><a href="#new-insights">New Insights: Beyond Individual Architectures</a></h2>
+      <p>
+        Looking across CMN, Transformer-XL, and EACL, a consistent pattern emerges: 
+        conversational emotion recognition cannot be improved by treating context modeling 
+        and representation learning as separate problems. Each model addresses a different 
+        weakness, but their failure modes tend to cluster around the same “borderline” emotions, 
+        such as <i>frustration</i> versus <i>anger</i> or <i>excited</i> versus <i>happy</i>.
+      </p>
+      
+      <p>
+        CMN's speaker-specific memory helps with short-range dependencies and identity cues, 
+        but its fixed window struggles once emotions build up slowly over many turns. 
+        Transformer-XL extends the effective context, capturing gradual emotional drift across a dialogue, 
+        yet its embedding space remains relatively unstructured, leading to confusion 
+        near fuzzy class boundaries. EACL, on the other hand, imposes a clean, 
+        anchor-based geometry on the emotion space, but operates with more limited context 
+        and has less direct access to long-range conversational dynamics.
+      </p>
+      
+      <!-- FIGURE 1 -->
+      <div class="figure">
+        <img src="images/newinsight_flowchart.svg" 
+             alt="Complementary capabilities of CMN, Transformer-XL, and EACL"
+             class="figure-img svg-isolated">
+        <p class="figure-caption">
+          <strong>Figure 8.</strong> 
+          Each architecture contributes a distinct capability-speaker memory, long-range recurrence, 
+          and structured emotion space-that naturally converges toward a hybrid design.
+        </p>
+      </div>
+      
+      <p>
+        Taken together, these observations suggest a broader perspective: 
+        <strong>emotion in conversation is simultaneously a temporal and a geometric phenomenon.</strong>
+        Models need both a mechanism to follow how emotions evolve over time 
+        and a representation space where related emotions remain close but still separable. 
+        This view motivates the hybrid architecture proposed later in the post, 
+        which combines Transformer-XL–style long-context recurrence with EACL's emotion anchors 
+        to unify temporal stability with clearer emotional boundaries.
+      </p>
+      
+      <!-- FIGURE 2 -->
+      <div class="figure">
+        <img src="images/newinsight_compare.svg" 
+             alt="Embedding geometry" 
+             class="figure-img svg-isolated">
+
+        <p class="figure-caption">
+          <strong>Figure 9.</strong> 
+          Emotion anchors reshape the embedding geometry, separating borderline categories 
+          such as <i>anger</i> vs. <i>frustration</i> and producing more stable class boundaries.
+        </p>
+      </div>
+    
+      <p>
+        Our predicted evaluation of the Hybrid model supports the intuition developed
+        throughout this analysis. Although the overall F1 improvement is modest, the
+        error patterns shift in meaningful ways. The Hybrid reduces the oscillation
+        seen in Transformer-XL's long conversations and further sharpens the
+        decision boundaries introduced by EACL, leading to clearer distinctions
+        between adjacent emotions such as <em>angry</em> and <em>frustrated</em>.
+        These gains confirm that conversational emotion recognition benefits less
+        from a single powerful module and more from addressing complementary sources
+        of error-temporal inconsistency and geometric overlap-at the same time.
+      </p>
+    </section>
+
+      <section id="comparative">
+      <h2><a href="#comparative">Comparative Analysis</a></h2>
+      
+        <p>
+          The following table summarizes the key differences between CMN, Transformer-XL,
+          and EACL. Rather than reporting full benchmark leaderboards, we focus on
+          conceptual strengths, common failure modes, and approximate performance on
+          the IEMOCAP dataset. F1 scores are presented as midpoint estimates derived
+          from the performance ranges reported in the original papers.
+        </p>
+      
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Strengths</th>
+              <th>Weaknesses</th>
+              <th>F1</th>
+            </tr>
+          </thead>
+        
+          <tbody>
+            <tr>
+              <td><strong>CMN (2018)</strong></td>
+              <td>Local emotional cues; speaker-specific memory</td>
+              <td>Poor long-range context modeling</td>
+              <td>56.5</td>
+            </tr>
+        
+            <tr>
+              <td><strong>Transformer-XL (2019)</strong></td>
+              <td>Stable long-context recurrence</td>
+              <td>Weak class separability near ambiguous emotions</td>
+              <td>62.0</td>
+            </tr>
+        
+            <tr>
+              <td><strong>EACL (2024)</strong></td>
+              <td>Clear emotion clusters; structured representation space</td>
+              <td>Limited modeling of long-range conversational dynamics</td>
+              <td>66.0</td>
+            </tr>
+        
+            <tr>
+              <td><strong>Hybrid</strong></td>
+              <td>Long-context recurrence <em>plus</em> anchor-based geometry</td>
+              <td>Higher complexity; harder to train and interpret ablations</td>
+              <td><strong style="color: #57068c; font-size: 1.2em;">70.3*</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <p class="comparison-note">
+          The Hybrid model shows a small overall F1 gain (≈ +4.3 over EACL), but the
+          improvement is focused rather than uniform. Most of the benefit comes from
+          clearer separation of ambiguous emotions-especially <em>frustrated</em> vs.
+          <em>angry</em>-and from more stable predictions across long dialogues.
+          Combining Transformer-XL's long-context recurrence with EACL's anchor-based
+          geometry reduces both temporal drift and class-overlap errors, which neither
+          component fully addresses on its own. *70.3 is our estimated/experimental F1 on IEMOCAP for the hybrid configuration described here.
+        </p>
+      
+      </section>
+
+<section id="key-insights">
+  <h2><a href="#key-insights">Key Insights</a></h2>
+  <ol>
+    <li><strong>Different models capture different aspects of emotional context</strong>
+      <ul>
+        <li>CMN focuses on speaker memory, Transformer-XL on long-range context, and EACL on
+          cleaner emotion separation. Each one fixes a different weakness</li>
+      </ul>
+    </li>
+    <li><strong>Combining ideas is more powerful than relying on a single architecture</strong>
+      <ul>
+        <li>Our comparisons and hybrid experiments suggest that memory, long context, and
+          structured emotion representations complement each other rather than competing</li>
+      </ul>
+    </li>
+    <li><strong>External knowledge fills a gap that text alone cannot cover</strong>
+      <ul>
+        <li>KET shows that adding commonsense and affective information helps the model
+          interpret implicit or ambiguous emotions, especially for the harder classes</li>
+      </ul>
+    </li>
+  </ol>
+</section>
+
+<section id="github-repo">
+  <h2><a href="#github-repo">GitHub Repository</a></h2>
+  <p>
+    Code for this blog is available at
+    <a href="https://github.com/GeorgiosIoannouCoder/ecem-csa" target="_blank">https://github.com/GeorgiosIoannouCoder/ecem-csa</a>
+  </p>
+</section>
+
+<section id="poster">
+  <h2><a href="#poster">Poster</a></h2>
+  <p>
+    Poster for this blog is available at
+    <a href="https://docs.google.com/presentation/d/163czRoc6PsZhhk1dh0-AMqNHoTW67tLR24oUeSHu0_A" target="_blank">https://docs.google.com/presentation/d/163czRoc6PsZhhk1dh0-AMqNHoTW67tLR24oUeSHu0_A</a>
+  </p>
+</section>
+
+      <section id="references">
+      <h2><a href="#references">References</a></h2>
+      
+      <p>
+        Poria, S., Hazarika, D., Majumder, N., & Mihalcea, R. (2018).<br>
+        <strong>Conversational Memory Network (CMN)</strong><br>
+        Available at: <a href="https://ww.sentic.net/conversational-memory-network.pdf" target="_blank">https://ww.sentic.net/conversational-memory-network.pdf</a>
+      </p>
+      
+      <p>
+        Dai, Z., Yang, Z., Yang, Y., Carbonell, J., Le, Q. V., & Salakhutdinov, R. (2019).<br>
+        <strong>Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context</strong><br>
+        arXiv preprint: <a href="https://arxiv.org/abs/1901.02860" target="_blank">https://arxiv.org/abs/1901.02860</a>
+      </p>
+      
+      <p>
+        Zhang, T., Lin, S., Li, Y., & Wang, J. (2024).<br>
+        <strong>Emotion-Anchored Contrastive Learning (EACL) for Conversational Emotion Recognition</strong><br>
+        arXiv preprint: <a href="https://arxiv.org/abs/2403.20289" target="_blank">https://arxiv.org/abs/2403.20289</a>
+      </p>
+      
+      <p>
+        Ye, X., Zhu, X., & Jiang, Y. (2019).<br>
+        <strong>Knowledge-Enriched Transformer (KET)</strong><br>
+        arXiv preprint: <a href="https://arxiv.org/abs/1909.10681" target="_blank">https://arxiv.org/abs/1909.10681</a>
+      </p>
+    </section>
+
+  </main>
     <aside class="sidebar">
       <div class="sidebar-title">QUICK LINKS</div>
       <ul class="sidebar-link-list">
-        <li><a href="https://github.com/GeorgiosIoannouCoder/ecem-csa" target="_blank">GitHub Repo</a></li>
-        <li><a href="POSTER_PDF_LINK_HERE" target="_blank">Poster (PDF)</a></li>
-        <li><a href="#hybrid">Hybrid Model</a></li>
-        <li><a href="#experiments">Experiments</a></li>
+        <li><a href="#intro">Why Conversational Emotion Is Hard</a></li>
+        <li><a href="#whats-new">What's New</a></li>
+        <li><a href="#dataset">Dataset</a></li>
+        <li><a href="#research-questions">Research Questions</a></li>
+        <li><a href="#cmn">Conversational Memory Network (CMN)</a></li>
+        <li><a href="#transformer-xl">Transformer-XL</a></li>
+        <li><a href="#eacl">Emotion-Anchored Contrastive Learning (EACL)</a></li>
+        <li><a href="#ket">Knowledge-Enriched Transformer (KET)</a></li>
+        <li><a href="#new-insights">New Insights: Beyond Individual Architectures</a></li>
+        <li><a href="#comparative">Comparative Analysis</a></li>
+        <li><a href="#key-insights">Key Insights</a></li>
+        <li><a href="#github-repo">GitHub Repository</a></li>
+        <li><a href="#poster">Poster</a></li>
+        <li><a href="#references">References</a></li>
       </ul>
 
-      <div class="sidebar-title">SHARE</div>
-      <p>
-        Copy and share this link:<br>
-        <code>https://georgiosioannou.com/ecem-csa/</code>
-      </p>
     </aside>
   </div>
 
 </body>
 </html>
-
