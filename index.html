@@ -90,6 +90,54 @@
         boundaries become clearer.
       </p>
 
+      <!-- NEW ANALYSIS: error structure under EACL -->
+      <figure class="figure">
+        <img src="images/EACL-heatmap.png"
+             alt="Error heatmap for EACL on IEMOCAP"
+             class="figure-image">
+        <figcaption class="figure-caption">
+          <strong>Figure 1. How EACL changes the error structure.</strong>
+          We plot a heatmap of prediction errors on IEMOCAP to see which emotion pairs are still
+          confused under EACL. The main patterns are:
+          <ul>
+            <li><b>Excited–Happy</b> and <b>Frustrated–Angry</b> show noticeably fewer cross-class errors
+                compared to the baseline, indicating that anchor-based training helps separate these
+                subtle pairs.</li>
+            <li><b>Neutral–Sad</b> remains a major source of confusion, suggesting that conversational
+                ambiguity and similar lexical cues limit how cleanly these two classes can be separated.</li>
+          </ul>
+          This error-level view is not reported in the original EACL paper and highlights how anchors
+          behave specifically in a conversational setting.
+        </figcaption>
+      </figure>
+
+      <!-- NEW ANALYSIS: geometry of emotion anchors -->
+      <figure class="figure">
+        <img src="images/eacl-anchor.png"
+             alt="Emotion anchors and utterance clusters in embedding space"
+             class="figure-image figure-image-small">
+        <figcaption class="figure-caption">
+          <strong>Figure 2. Emotion anchors act as attractors in embedding space.</strong>
+          We visualize the learned anchors together with utterance embeddings. After training:
+          <ul>
+            <li>Utterances with the same label form tighter, more compact clusters around their
+                corresponding anchors.</li>
+            <li>Anchors themselves move to more “central” positions inside each cluster, acting as
+                attractors that stabilize emotion-specific regions.</li>
+            <li>Border regions between <b>excited–happy</b> and <b>frustrated–angry</b> become sharper,
+                while the overlap between <b>neutral</b> and <b>sad</b> remains visible.</li>
+          </ul>
+        </figcaption>
+      </figure>
+
+      <p>
+        Taken together, these analyses show that EACL does more than increase accuracy: it tightens the
+        geometry of the representation space and makes several confusable emotions easier to tell apart,
+        while revealing intrinsic limits for ambiguous classes like <i>neutral</i> vs. <i>sad</i>.
+        This provides an interpretable lens on how contrastive anchors reshape conversational emotion
+        representations, which we later combine with long-context modeling in our hybrid architecture.
+      </p>
+
       <h2 id="hybrid">6. Hybrid Architecture: Long Context + Emotion Anchors</h2>
       <p>
         Our main insight is that long-context modeling and emotion-anchored representation learning are

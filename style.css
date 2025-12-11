@@ -140,3 +140,33 @@ h3 {
   .hero-inner { flex-direction: column; align-items: flex-start; }
   .page { flex-direction: column; }
 }
+/* ----------------------------
+   Figure & Image Styles
+----------------------------- */
+.figure {
+  margin: 24px 0;
+}
+
+.figure-image {
+  width: 100%;
+  max-width: 640px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* 第二张图用小号版本：宽度缩到大约 1/4 */
+.figure-image-small {
+  width: 50%;        /* 可以改成 20% / 30% 微调 */
+  max-width: 420px;  /* 再限制一个最大宽度，防止太大 */
+}
+
+.figure-caption {
+  font-size: 0.9rem;
+  color: #5f6368;
+  margin-top: 8px;
+}
+
+.figure-caption ul {
+  margin: 4px 0 0 20px;
+  padding-left: 0;
+}
