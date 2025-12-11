@@ -58,7 +58,7 @@
     <section id="whats-new">
       <h2><a href="#whats-new">What's New</a></h2>
       <ul>
-        <li><strong>Reproductions</strong></br>We reproduce CMN, Transformer-XL, and EACL on IEMOCAP and report our measured F1s versus the original papers</li>
+        <li><strong>Reproduction</strong></br>We reproduce CMN, Transformer-XL, and EACL on IEMOCAP and report our measured F1s versus the original papers</li>
         <li><strong>Hybrid Model</strong></br>We propose a hybrid that combines TXL long-context recurrence with EACL emotion anchors; we report our estimated F1 and where it helps most</li>
       </ul>
     </section>
@@ -148,7 +148,7 @@
       </ul>
       
       <p>
-        These questions structure our investigation, from individual model analysis to comparative evaluation and finally to hybrid architecture design. Each question builds upon the previous one, leading toward a comprehensive understanding of how different architectural choices impact conversational emotion recognition.
+        These 3 questions structure our investigation, from individual model analysis to comparative evaluation and finally to hybrid architecture design. Each question builds upon the previous one, leading toward a comprehensive understanding of how different architectural choices impact conversational emotion recognition.
       </p>
     </section>
 
@@ -458,6 +458,13 @@ Transformer-XL shows the largest improvements on <em>long conversations</em> whe
         from a single powerful module and more from addressing complementary sources
         of error-temporal inconsistency and geometric overlap-at the same time.
       </p>
+      
+      <div class="insight-pink-box">
+        <div class="insight-pink-title">Future Addition</div>
+        <p>
+          Beyond these core components, external knowledge remains another complementary dimension. While not explicitly integrated into our Hybrid architecture, <strong>KET-style knowledge enrichment</strong> can be layered on top of any of the models we examined, providing commonsense grounding for emotions expressed implicitly (e.g. funeral -> sadness, celebration -> joy). In this sense, KET <strong>does not compete</strong> with our Hybrid model. Rather, it <strong>illustrates a parallel axis of improvement-semantic grounding</strong> that can further strengthen systems built on temporal modeling and geometric separation.
+        </p>
+      </div>
     </section>
 
       <section id="comparative">

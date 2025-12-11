@@ -569,6 +569,23 @@ strong {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
+.insight-pink-box {
+  background-color: #eee6f3;
+  padding: 16px 20px;
+  border-radius: 6px;
+  margin-top: 24px;
+  line-height: 1.6;
+}
+
+.insight-pink-title {
+  color: #57068c;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
 #references {
   margin-top: 56px;
 }
